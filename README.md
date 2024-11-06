@@ -90,3 +90,6 @@ streamlit run webpage_handler.py
 - OpenAI's text-embedding-3-small for vector embeddings
 - AssemblyAI's speech recognition API with speaker diarization
 
+This project was developed in collaboration with my partner. You can find the complete project history and commits at:
+[Original Project Repository](https://github.com/NoyaArav/Final_Project-From-Idea-To-Reality)
+
