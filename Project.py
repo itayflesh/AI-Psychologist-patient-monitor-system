@@ -8,20 +8,26 @@ import sqlite3
 from sklearn.metrics.pairwise import cosine_similarity
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+from dotenv import load_dotenv
 import textwrap
 
 from embedding_handler import generate_embedding, generate_query_embedding, search_similar_sentences
 from database_handler import create_tables, insert_session_data, update_session_embedding, add_patient, fetch_patient_embeddings, fetch_session_data, insert_topic
 
-aai.settings.api_key = "" # Add your AssemblyAI API key here
+# Load environment variables
+load_dotenv()
+
+# Set up API keys 
+aai_api_key = os.getenv("ASSEMBLY_API_KEY")
+if aai_api_key:
+    aai.settings.api_key = aai_api_key
+else:
+    raise ValueError("AssemblyAI API key not found. Please check your .env file.")
 
 client = OpenAI(
-  api_key = "" # Add your OpenAI API key here
+  api_key = os.getenv("OPENAI_API_KEY")
 )
-openai_api_model = "gpt-3.5-turbo"
-
-# audio_file = "/Users/noyaarav/Desktop/Final-Project-From-Idea-To-Reality/audio_files/13mins_session_depression.mp4"
-audio_file = "/Users/noyaarav/Desktop/Final-Project-From-Idea-To-Reality/audio_files/session2_social_anxiety_Hannah.mp4"
+openai_api_model = "gpt-4o-mini"
 
 
 # Sentiment score dictionaries
@@ -49,7 +55,7 @@ def get_sentiment(text, is_patient):
     """
 
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a skilled psychologist with expertise in emotion analysis."},
             {"role": "user", "content": prompt}
@@ -75,12 +81,17 @@ def determine_speaker_roles(transcript):
     sample = "\n".join([f"Speaker {u.speaker}: {u.text}" for u in transcript.utterances[:15]])
     
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         temperature=0,
         messages=[
             {"role": "system", "content": "You are an AI trained to analyze conversation transcripts and determine which speaker is the psychologist and which is the patient."},
             {"role": "user", "content": f"""Based on the following transcript sample, determine whether Speaker A is the psychologist and Speaker B is the patient, or vice versa. 
-            Return your answer as a JSON object with keys 'psychologist' and 'patient', and values 'A' or 'B'.
+            Return ONLY a JSON object with exactly this structure:
+             
+            {{
+            "psychologist": "[A or B]",
+            "patient": "[A or B]"
+            }}
 
             Transcript sample:
             {sample}"""}
@@ -194,7 +205,7 @@ If there is no actual drastic change in emotion in the provided context and the 
 
     # Send the prompt to ChatGPT
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         temperature=0,  # Lower temperature for more deterministic output
         messages=[
             {"role": "system", "content": "You are an AI assistant tasked with analyzing transcripts of therapy sessions to identify emotional changes and the topics that cause them."},
@@ -318,7 +329,7 @@ def remove_similar_topics(topics):
             print(f"Comparing '{topics[i]}' with '{unique_topics[j]}'")
             
             response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant that determines if topics are similar."},
                     {"role": "user", "content": prompt}
@@ -409,7 +420,7 @@ def get_topics_to_revisit(prev_session_topics, last_session_topics):
 
     # Send the prompt to ChatGPT
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         temperature=0,  # Lower temperature for more deterministic output
         messages=[
             {"role": "system", "content": "You are an expert assistant in analyzing conversational topics for therapeutic sessions."},

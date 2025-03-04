@@ -2,9 +2,14 @@ from openai import OpenAI
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from database_handler import fetch_patient_embeddings
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 client = OpenAI(
-  api_key = "" #Add your OpenAI API key here
+  api_key = os.getenv("OPENAI_API_KEY")
 )
 
 def generate_embedding(text):
