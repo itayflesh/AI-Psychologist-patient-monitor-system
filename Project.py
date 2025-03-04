@@ -108,6 +108,7 @@ def detect_drastic_changes(session_data, threshold):
     print(f"Number of entries in session_data: {len(session_data)}")
     
     drastic_changes = []
+    # Keep track of used IDs to avoid duplicate comparisons
     used_ids = set()
 
     for i in range(1, len(session_data)):
@@ -121,7 +122,7 @@ def detect_drastic_changes(session_data, threshold):
         print(f"  Previous: {previous['sentence'][:50]}... (Words: {words_previous}, Score: {previous['sentiment_score']})")
         print(f"  Current:  {current['sentence'][:50]}... (Words: {words_current}, Score: {current['sentiment_score']})")
 
-        if words_current > 5 and words_previous > 5 and current['id'] not in used_ids and previous['id'] not in used_ids:
+        if words_current >= 5 and words_previous >= 5 and current['id'] not in used_ids and previous['id'] not in used_ids:
             score_change = current['sentiment_score'] - previous['sentiment_score']
             print(f"  Score change: {score_change}")
 
@@ -139,6 +140,7 @@ def detect_drastic_changes(session_data, threshold):
                 print("  Skipped due to previously used IDs")
 
     print(f"\nTotal drastic changes detected: {len(drastic_changes)}")
+    #return the first 7 elements of the list
     return drastic_changes[:7]
   
 def get_context_for_change(transcript, index1, index2):
