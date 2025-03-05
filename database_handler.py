@@ -1,48 +1,6 @@
 import sqlite3
 import numpy as np
 
-def create_tables():
-    conn = sqlite3.connect('patient_sessions.db')
-    cursor = conn.cursor()
-
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS patients (
-        patient_id INTEGER PRIMARY KEY,
-        name TEXT,
-        birthdate TEXT,
-        notes TEXT
-    )
-    ''')
-
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS sessions (
-        id INTEGER PRIMARY KEY,
-        patient_id INTEGER,
-        session_id TEXT,
-        sentence TEXT,
-        speaker TEXT,
-        embedding BLOB,
-        sentiment TEXT,
-        sentiment_score REAL,
-        FOREIGN KEY(patient_id) REFERENCES patients(patient_id)
-    )
-    ''')
-    
-    # Create a single topics table with patient-specific entries
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS topics (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        patient_id INTEGER,
-        session_id TEXT,
-        topic TEXT,
-        FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
-    )
-    ''')
-
-
-    conn.commit()
-    conn.close()
-
 def initialize_database():
     conn = sqlite3.connect('patient_sessions.db')
     cursor = conn.cursor()
@@ -90,7 +48,10 @@ def add_patient(patient_id, name, birthdate, notes):
     conn = sqlite3.connect('patient_sessions.db')
     cursor = conn.cursor()
 
+    # Check if patient already exists
     cursor.execute('SELECT 1 FROM patients WHERE patient_id = ?', (patient_id,))
+    
+    # If patient does not exist, insert new patient
     if cursor.fetchone() is None:
         cursor.execute('''
         INSERT INTO patients (patient_id, name, birthdate, notes)

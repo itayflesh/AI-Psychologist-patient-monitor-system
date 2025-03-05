@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 import textwrap
 
 from embedding_handler import generate_embedding, generate_query_embedding, search_similar_sentences
-from database_handler import create_tables, insert_session_data, update_session_embedding, add_patient, fetch_patient_embeddings, fetch_session_data, insert_topic
+from database_handler import insert_session_data, update_session_embedding, add_patient, fetch_patient_embeddings, fetch_session_data, insert_topic
 
 # Load environment variables
 load_dotenv()
@@ -128,7 +128,8 @@ def detect_drastic_changes(session_data, threshold):
                 print("  Skipped due to previously used IDs")
 
     print(f"\nTotal drastic changes detected: {len(drastic_changes)}")
-    #return the first 7 elements of the list
+
+    #return 7 most drastic changes
     return drastic_changes[:7]
   
 def get_context_for_change(transcript, index1, index2):
@@ -275,9 +276,10 @@ def detect_and_store_topics(patient_id, session_id, session_data):
 
     for change in drastic_changes:
         id1, id2, change_value = change
+        # Get 7-sentence context around the change
         context = [entry for entry in session_data if id1 - 3 <= entry['id'] <= id2 + 3]
 
-        # Check if there are at least 6 sentences in the context
+        # Check if there is enough context for analysis
         if len(context) < 7:
             print(f"Skipping change {id1} to {id2} due to insufficient context")
             continue
