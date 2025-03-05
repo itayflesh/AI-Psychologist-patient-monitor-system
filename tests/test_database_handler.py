@@ -76,10 +76,13 @@ def setup_database():
     # Apply the patch
     sqlite3.connect = patched_connect
     
+    # yield is used to run the test functions and teardown after the tests are done
     yield
     
-    # Teardown - restore the original function and remove the test database
+    # return the original connect function
     sqlite3.connect = original_connect
+
+    # Remove the test database
     if os.path.exists(TEST_DB):
         os.remove(TEST_DB)
 
