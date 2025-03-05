@@ -3,7 +3,6 @@ import sqlite3
 import os
 import numpy as np
 from database_handler import (
-    create_tables,
     add_patient,
     insert_session_data,
     update_session_embedding,
