@@ -29,18 +29,6 @@ client = OpenAI(
 )
 openai_api_model = "gpt-4o-mini"
 
-
-# Sentiment score dictionaries
-patient_sentiment_scores = {
-    "Despair": -5, "Anger": -4, "Anxiety": -3, "Sadness": -2, "Discomfort": -1,
-    "Natural": 0, "Contentment": 1, "Hopefulness": 2, "Happiness": 3, "Excitement": 4, "Euphoria": 5
-}
-
-psychologist_sentiment_scores = {
-    "Overwhelm": -5, "Helplessness": -4, "Sadness": -3, "Frustration": -2, "Concern": -1,
-    "Natural": 0, "Contentment": 1, "Encouragement": 2, "Empathy": 3, "Optimism": 4, "Fulfillment": 5
-}
-
 def get_sentiment(text, is_patient):
     prompt = f"""
     Analyze what sentiment the {"patient" if is_patient else "psychologist"} is experiencing when saying the following text, which is a part of a psychologist-patient conversation. Respond with:
@@ -376,7 +364,7 @@ def identify_topics_to_revisit(patient_id):
     # Check if there are at least two sessions
     if len(session_ids) < 2:
         conn.close()
-        return []
+        return None
 
     last_session_id, prev_session_id = session_ids[0][0], session_ids[1][0]
 
@@ -388,6 +376,10 @@ def identify_topics_to_revisit(patient_id):
     cursor.execute("SELECT topic FROM topics WHERE patient_id = ? AND session_id = ?", (patient_id, prev_session_id))
     prev_session_topics = [row[0] for row in cursor.fetchall()]
 
+    if len(prev_session_topics) == 0:
+        conn.close()
+        return None
+    
     conn.close()
 
     # Use ChatGPT to determine which topics from the previous session should be revisited
@@ -499,7 +491,7 @@ def generate_new_session_id(patient_id):
       
       
 
-def generate_sentiment_graph(session_data, title, sentiment_scores , speaker):
+def generate_sentiment_graph(session_data , title , speaker):
     """
     Generates a sentiment graph for a given session.
     

@@ -15,17 +15,6 @@ if 'search_results' not in st.session_state:
 if 'show_transcript' not in st.session_state:
     st.session_state.show_transcript = {}
 
-# Sentiment score dictionaries
-patient_sentiment_scores = {
-    "Despair": -5, "Anger": -4, "Anxiety": -3, "Sadness": -2, "Discomfort": -1,
-    "Natural": 0, "Contentment": 1, "Hopefulness": 2, "Happiness": 3, "Excitement": 4, "Euphoria": 5
-}
-
-psychologist_sentiment_scores = {
-    "Overwhelm": -5, "Helplessness": -4, "Sadness": -3, "Frustration": -2, "Concern": -1,
-    "Natural": 0, "Contentment": 1, "Encouragement": 2, "Empathy": 3, "Optimism": 4, "Fulfillment": 5
-}
-
 # Initialize the database
 initialize_database()
 
@@ -311,7 +300,7 @@ def main():
                 # Display patient's sentiment graph
                 st.subheader("Patient's Sentiment Analysis")
                 patient_data = [entry for entry in session['session_data'] if entry['speaker'].lower() == 'patient']
-                sentiment_graph_patient = generate_sentiment_graph(patient_data, f"Patient Sentiment Analysis - {selected_session}", patient_sentiment_scores, "patient")
+                sentiment_graph_patient = generate_sentiment_graph(patient_data, f"Patient Sentiment Analysis - {selected_session}", "patient")
                 st.plotly_chart(sentiment_graph_patient)
 
                 # Display emotional changes analysis
@@ -329,7 +318,7 @@ def main():
                 
                 # Display psychologist's sentiment graph
                 st.subheader("Psychologist's Sentiment Analysis")
-                sentiment_graph_Psychologist = generate_sentiment_graph(session['session_data'], f"Psychologist Sentiment Analysis - {selected_session}", psychologist_sentiment_scores, "psychologist")
+                sentiment_graph_Psychologist = generate_sentiment_graph(session['session_data'], f"Psychologist Sentiment Analysis - {selected_session}", "psychologist")
                 st.plotly_chart(sentiment_graph_Psychologist)
             else:
                 st.write("No sessions available for this patient.")
