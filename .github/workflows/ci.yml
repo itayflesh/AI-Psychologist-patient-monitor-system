@@ -4,7 +4,7 @@ name: Patient Monitor System CI
 on:
   push:
     branches: [ main ]
-  
+ 
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -33,7 +33,9 @@ jobs:
         echo "ASSEMBLY_API_KEY=dummy_key" > .env
         echo "OPENAI_API_KEY=dummy_key" >> .env
         
-    # Step 5: Run tests
+    # Step 5: Run tests with PYTHONPATH set
     - name: Run tests
       run: |
-        pytest tests/
+        python -m pytest tests/
+      env:
+        PYTHONPATH: ${{ github.workspace }}
