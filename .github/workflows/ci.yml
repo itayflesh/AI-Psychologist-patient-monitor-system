@@ -1,0 +1,39 @@
+name: Patient Monitor System CI
+
+# Define when this workflow will run
+on:
+  push:
+    branches: [ main ]
+  
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Step 1: Check out the repository code
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    # Step 2: Set up Python environment
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    # Step 4: Create test environment
+    - name: Setup test environment
+      run: |
+        echo "ASSEMBLY_API_KEY=dummy_key" > .env
+        echo "OPENAI_API_KEY=dummy_key" >> .env
+        
+    # Step 5: Run tests
+    - name: Run tests
+      run: |
+        pytest tests/
